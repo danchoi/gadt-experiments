@@ -15,13 +15,21 @@ data Constraint a where
   Equals :: Eq a => Field a -> a -> Constraint a
   LessThan :: Ord a => Field a -> a -> Constraint a
   Match :: Field String -> String -> Constraint String
-  Range :: Field a -> (a, a) -> Constraint a
+  Range :: Ord a => Field a -> (a, a) -> Constraint a
 
 instance (Show a) => Show (Constraint a) where
   show (Equals f v) = show f ++ " == " ++ show v
   show (LessThan f v) = show f ++ " < " ++ show v
   show (Match f s) = show f ++ " =~ " ++ show s
   show (Range f s@(x,y)) = show f ++ " between " ++ show s
+
+
+eval :: Constraint a -> a -> Bool
+eval (Equals f v) v' = v == v'
+eval (LessThan f v) v' = v < v'
+eval (Match f v) v' = v == v'
+eval (Range f (x,y)) v   = v >= x && v <= y
+
 
 main = do
   let c = Equals Year 1999
@@ -41,5 +49,14 @@ main = do
   print f'
   print g
   print h
+  print $ eval c 1999
+  print $ eval c 2000
+  print $ eval h 21
+  -- print $ eval h 21.0 -- type mismatch
+  print $ eval f' 1991
+  print $ eval f' 1980
+  -- print $ eval f' 'a'  -- type mismatch
+  print $ eval e "Miramax"
+  -- print $ eval e 200  -- invalid
 
 
