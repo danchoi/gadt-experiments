@@ -4,10 +4,12 @@ module Main where
 data Field a where 
   Year :: Field Int 
   Studio :: Field String
+  Rating :: Num a => Field a
  
 instance Show (Field a) where
   show Year = "Year" 
   show Studio = "Studio" 
+  show Rating = "Rating" 
 
 data Constraint a where
   Equals :: Eq a => Field a -> a -> Constraint a
@@ -28,9 +30,13 @@ main = do
   -- let f = Range Studio (1,10) -- invalid
   let f' = Range Year (1990, 2010)
   -- let invalid = Match 2002 -- fails
+  let g = Equals Rating (2.0 :: Float)
+  let h = LessThan Rating (20 :: Int)
   print c
   print d
   print e
   print f'
+  print g
+  print h
 
 
