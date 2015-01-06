@@ -6,10 +6,13 @@ data Field a where
   Studio :: Field String
   Rating :: Num a => Field a
  
-instance Show (Field a) where
-  show Year = "Year" 
-  show Studio = "Studio" 
-  show Rating = "Rating" 
+class ToDBField a where
+  toDBField :: a -> String
+
+instance ToDBField (Field a) where
+  toDBField Year = "Year" 
+  toDBField Studio = "Studio" 
+  toDBField Rating = "Rating" 
 
 data Constraint a where
   Equals :: Eq a => Field a -> a -> Constraint a
@@ -30,17 +33,18 @@ class ToQuery a where
 
 
 instance Show a => ToQuery (Constraint a) where
-  toQuery (Equals f v) = show f ++ " == " ++ show v
-  toQuery (LessThan f v) = show f ++ " < " ++ show v
-  toQuery (Match f s) = show f ++ " =~ " ++ show s
-  toQuery (Range f s@(x,y)) = show f ++ " between " ++ show s
+  toQuery (Equals f v) = toDBField f ++ " == " ++ show v
+  toQuery (LessThan f v) = toDBField f ++ " < " ++ show v
+  toQuery (Match f s) = toDBField f ++ " =~ " ++ show s
+  toQuery (Range f s@(x,y)) = toDBField f ++ " between " ++ show s
 
 
 
 
-data AnyField = forall a. Show a => AnyField a
-instance Show AnyField where
-  showsPrec p (AnyField a) = showsPrec p a
+data AnyField = forall a. ToDBField  a => AnyField a
+
+instance ToDBField AnyField where
+  toDBField (AnyField a) = toDBField a
 
 toField :: String -> AnyField
 toField "year" = AnyField Year
@@ -80,13 +84,13 @@ main = do
   print $ eval e "Miramax"
   -- print $ eval e 200  -- invalid
 
-  print $ toField "year"
-  print $ [toField "year", toField "studio"]
-  print $ map toField ["year", "studio"]
+  print $ toDBField $ toField "year"
+  print $ map toDBField $ [toField "year", toField "studio"]
+  print $ map (toDBField . toField) ["year", "studio"]
 
 
   -- Existentials https://www.haskell.org/haskellwiki/Existential_type
 
   -- print $ map toFacet [Year, Studio] -- invalid
-  print $ map toFacet' [Facetable Year, Facetable Studio] -- WORKS
+  -- print $ map toFacet' [Facetable Year, Facetable Studio] -- WORKS
 
