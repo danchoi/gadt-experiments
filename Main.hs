@@ -27,9 +27,11 @@ main = do
   let c = Equals Year 1999
   let d = LessThan Year 2001
   let e = Match Studio "Miramax"
+  -- let invalid = Match 2002 -- fails
+
   -- let f = Range Studio (1,10) -- invalid
   let f' = Range Year (1990, 2010)
-  -- let invalid = Match 2002 -- fails
+
   let g = Equals Rating (2.0 :: Float)
   let h = LessThan Rating (20 :: Int)
   -- let j = LessThan Rating 't' -- invalid
