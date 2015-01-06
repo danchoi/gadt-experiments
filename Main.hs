@@ -44,19 +44,19 @@ toQuery (Match f s) = toDBField f ++ " =~ " ++ toQVal s
 toQuery (Range f x y) = toDBField f ++ " between " ++ show x ++ " and " ++ show y
 
 fromPairs :: (String, [String]) -> Constraint
-fromPairs ("year",xs) = intConstraint Year xs
+fromPairs ("year",xs) = numConstraint Year xs
 fromPairs ("studio",xs) = strConstraint Studio xs 
-fromPairs ("rating",xs) = intConstraint Rating xs
+fromPairs ("rating",xs) = numConstraint Rating xs
 fromPairs _ = undefined
 
 toParamParser :: String -> ([String] -> Constraint)
-toParamParser "year" = intConstraint Year
+toParamParser "year" = numConstraint Year
 toParamParser "studio" = strConstraint Studio
 toParamParser "rating" = strConstraint Studio
 
-intConstraint :: (Num a, Read a, ToQVal a, Eq a, Show a) => Field a -> [String] -> Constraint
-intConstraint field [x] = Equals field (read x)
-intConstraint field (x:y:_) = Range field (read x) (read y)
+numConstraint :: (Num a, Read a, ToQVal a, Eq a, Show a) => Field a -> [String] -> Constraint
+numConstraint field [x] = Equals field (read x)
+numConstraint field (x:y:_) = Range field (read x) (read y)
 
 strConstraint :: Field String -> [String] -> Constraint
 strConstraint field (x:_) = Equals field x
