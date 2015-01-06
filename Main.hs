@@ -1,11 +1,11 @@
-{-# LANGUAGE OverloadedStrings, GADTs #-} 
+{-# LANGUAGE OverloadedStrings, GADTs, TypeSynonymInstances, FlexibleInstances #-} 
 module Main where
 import Data.Typeable
 
 data Field a where 
   Year :: Field Int 
   Studio :: Field String
-  Rating :: Num a => Field a
+  Rating :: Field Float 
  
 class ToDBField a where
   toDBField :: a -> String
@@ -16,18 +16,28 @@ instance ToDBField (Field a) where
   toDBField Rating = "rating" 
 
 data Constraint where
-  Equals :: (Show a, Eq a) => Field a -> a -> Constraint 
-  LessThan :: (Show a, Ord a) => Field a -> a -> Constraint 
+  Equals :: (ToQVal a, Eq a) => Field a -> a -> Constraint 
+  LessThan :: (ToQVal a, Ord a) => Field a -> a -> Constraint 
   Match :: Field String -> String -> Constraint 
-  Range :: (Show a, Ord a) => Field a -> (a, a) -> Constraint 
+  Range :: (Show a, Num a) => Field a -> (a, a) -> Constraint 
 
+-- for quoting in query if necessary
+class ToQVal a where
+    toQVal :: a -> String
+
+instance ToQVal String where 
+    toQVal x = "S'" ++ show x ++ "'"
+
+instance ToQVal Int where 
+    toQVal = show 
+instance ToQVal Double where 
+    toQVal = show 
 
 toQuery :: Constraint -> String
-toQuery (Equals f v) = toDBField f ++ " == " ++ show v
-toQuery (LessThan f v) = toDBField f ++ " < " ++ show v
-toQuery (Match f s) = toDBField f ++ " =~ " ++ show s
-toQuery (Range f s@(x,y)) = toDBField f ++ " between " ++ show s
-
+toQuery (Equals f v) = toDBField f ++ " == " ++ toQVal v
+toQuery (LessThan f v) = toDBField f ++ " < " ++ toQVal v
+toQuery (Match f s) = toDBField f ++ " =~ " ++ toQVal s
+toQuery (Range f s@(x,y)) = toDBField f ++ " between " ++ show x ++ " and " ++ show y
 
 fromPairs :: (String, [String]) -> Constraint
 fromPairs ("year",[x]) = Equals Year (read x)
