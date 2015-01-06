@@ -49,7 +49,7 @@ fromPairs (k,vs) = toParamParser k $ vs
 toParamParser :: String -> ([String] -> Constraint)
 toParamParser "year" = numConstraint Year
 toParamParser "studio" = strConstraint Studio
-toParamParser "rating" = strConstraint Studio
+toParamParser "rating" = gtConstraint Rating
 
 numConstraint :: (Num a, Read a, ToQVal a, Eq a, Show a) => Field a -> [String] -> Constraint
 numConstraint field [x] = Equals field (read x)
