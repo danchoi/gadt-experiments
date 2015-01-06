@@ -31,6 +31,11 @@ eval (Match f v) v' = v == v'
 eval (Range f (x,y)) v   = v >= x && v <= y
 
 
+toFacet :: Field a -> String
+toFacet Year = "blah"
+toFacet Studio = "blah s"
+toFacet Rating = "blah r"
+
 main = do
   let c = Equals Year 1999
   let d = LessThan Year 2001
@@ -59,4 +64,7 @@ main = do
   print $ eval e "Miramax"
   -- print $ eval e 200  -- invalid
 
+
+  print $ toFacet Year
+  print $ toFacet Studio
 
