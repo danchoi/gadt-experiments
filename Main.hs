@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings, GADTs, StandaloneDeriving #-} 
+{-# LANGUAGE OverloadedStrings, GADTs #-} 
 module Main where
 
 data Field a where 
