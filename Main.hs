@@ -106,4 +106,7 @@ main = do
   print $ [ toDBField x | AnyField x <- [AnyField Year, AnyField Studio] ]
 
   -- uses instance ToQuery AnyConstraint, and fromPairs
-  print $ map (toQuery . fromPairs) [("year", "2000"), ("studio", "Miramax")]
+  mapM_ print $ map (toQuery . fromPairs) [("year", "2000"), ("studio", "Miramax")]
+  -- prints
+  -- "year == 2000"
+  --- "studio == \"Miramax\""
