@@ -39,7 +39,7 @@ instance ToQVal Float where
 toQuery :: Constraint -> String
 toQuery (Equals f v) = toDBField f ++ " == " ++ toQVal v
 toQuery (LessThan f v) = toDBField f ++ " < " ++ toQVal v
-toQuery ((:>:) f v) = toDBField f ++ " > " ++ toQVal v
+toQuery (f :>: v) = toDBField f ++ " > " ++ toQVal v
 toQuery (Match f s) = toDBField f ++ " =~ " ++ toQVal s
 toQuery (Range f s@(x,y)) = toDBField f ++ " between " ++ show x ++ " and " ++ show y
 
