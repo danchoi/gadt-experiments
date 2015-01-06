@@ -5,7 +5,7 @@ import Data.Typeable
 data Field a where 
   Year :: Field Int 
   Studio :: Field String
-  Rating :: Num a => Field a
+  Rating :: Field Float
  
 class ToDBField a where
   toDBField :: a -> String
@@ -18,6 +18,7 @@ instance ToDBField (Field a) where
 data Constraint where
   Equals :: (ToQVal a, Eq a) => Field a -> a -> Constraint 
   LessThan :: (ToQVal a, Ord a) => Field a -> a -> Constraint 
+  (:>:) :: (ToQVal a, Num a, Ord a) => Field a -> a -> Constraint
   Match :: Field String -> String -> Constraint 
   Range :: (Show a, Num a) => Field a -> (a, a) -> Constraint 
 
@@ -32,10 +33,13 @@ instance ToQVal Int where
     toQVal = show 
 instance ToQVal Double where 
     toQVal = show 
+instance ToQVal Float where 
+    toQVal = show 
 
 toQuery :: Constraint -> String
 toQuery (Equals f v) = toDBField f ++ " == " ++ toQVal v
 toQuery (LessThan f v) = toDBField f ++ " < " ++ toQVal v
+toQuery ((:>:) f v) = toDBField f ++ " > " ++ toQVal v
 toQuery (Match f s) = toDBField f ++ " =~ " ++ toQVal s
 toQuery (Range f s@(x,y)) = toDBField f ++ " between " ++ show x ++ " and " ++ show y
 
@@ -43,6 +47,7 @@ fromPairs :: (String, [String]) -> Constraint
 fromPairs ("year",[x]) = Equals Year (read x)
 fromPairs ("year",x:y:_) = Range Year ((read x), (read y))
 fromPairs ("studio",[x]) = Equals Studio x
+fromPairs ("rating",[x]) = Rating :>: (read x)
 fromPairs _ = undefined
 
 main = do
@@ -54,6 +59,7 @@ main = do
   -- "year == 2000"
   -- "studio == \"Miramax\""
   mapM_ print $ map (toQuery . fromPairs) [("year", ["2000", "2002"])]
+  mapM_ print $ map (toQuery . fromPairs) [("rating", ["3"])]
   -- "year between (2000,2002)"
 
   return ()
