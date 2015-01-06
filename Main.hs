@@ -37,8 +37,6 @@ fromPairs ("year",x:y:_) = Range Year ((read x), (read y))
 fromPairs ("studio",[x]) = Equals Studio x
 fromPairs _ = undefined
 
-
-
 main = do
   let c = Equals Year 1999
   -- let d = Match Studio 11 -- FAILS
