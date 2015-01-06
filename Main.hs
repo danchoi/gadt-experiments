@@ -109,4 +109,4 @@ main = do
   mapM_ print $ map (toQuery . fromPairs) [("year", "2000"), ("studio", "Miramax")]
   -- prints
   -- "year == 2000"
-  --- "studio == \"Miramax\""
+  -- "studio == \"Miramax\""
