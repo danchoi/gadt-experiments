@@ -49,6 +49,8 @@ data AnyField = forall a. ToDBField  a => AnyField a
 instance ToDBField AnyField where
   toDBField (AnyField a) = toDBField a
 
+-- conversion from param to Field type
+-- does not enforce exhaustive patterns
 toField :: String -> AnyField
 toField "year" = AnyField Year
 toField "studio" = AnyField Studio
@@ -94,3 +96,20 @@ main = do
   -- prints
   -- "year == 2000"
   -- "studio == \"Miramax\""
+
+{-
+
+"year == 1999"
+"year < 2001"
+"studio =~ \"Miramax\""
+"year between (1990,2010)"
+"rating == 2.0"
+"rating < 20"
+"year"
+["year","studio"]
+["year","studio"]
+["year","studio"]
+"year == 2000"
+"studio == \"Miramax\""
+-}
+
