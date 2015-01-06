@@ -5,7 +5,7 @@ import Data.Typeable
 data Field a where 
   Year :: Field Int 
   Studio :: Field String
-  Rating :: Field Float 
+  Rating :: Num a => Field a
  
 class ToDBField a where
   toDBField :: a -> String
