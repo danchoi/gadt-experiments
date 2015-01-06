@@ -76,6 +76,7 @@ main = do
 
   print $ toField "year"
   print $ [toField "year", toField "studio"]
+  print $ map toField ["year", "studio"]
 
 
   -- Existentials https://www.haskell.org/haskellwiki/Existential_type
