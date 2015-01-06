@@ -17,12 +17,6 @@ data Constraint a where
   Match :: Field String -> String -> Constraint String
   Range :: Ord a => Field a -> (a, a) -> Constraint a
 
-instance (Show a) => Show (Constraint a) where
-  show (Equals f v) = show f ++ " == " ++ show v
-  show (LessThan f v) = show f ++ " < " ++ show v
-  show (Match f s) = show f ++ " =~ " ++ show s
-  show (Range f s@(x,y)) = show f ++ " between " ++ show s
-
 eval :: Constraint a -> a -> Bool
 eval (Equals f v) v' = v == v'
 eval (LessThan f v) v' = v < v'
@@ -30,17 +24,17 @@ eval (Match f v) v' = v == v'
 eval (Range f (x,y)) v   = v >= x && v <= y
 
 
-data Expr where
-  Expr :: Show a => Constraint a -> a -> Expr
-  
+ 
 class ToQuery a where
   toQuery :: a -> String
 
-instance ToQuery Expr where
-  toQuery (Expr c v) = toQuery c ++ " " ++ show v
 
 instance Show a => ToQuery (Constraint a) where
-  toQuery = show
+  toQuery (Equals f v) = show f ++ " == " ++ show v
+  toQuery (LessThan f v) = show f ++ " < " ++ show v
+  toQuery (Match f s) = show f ++ " =~ " ++ show s
+  toQuery (Range f s@(x,y)) = show f ++ " between " ++ show s
+
 
 
 
@@ -70,12 +64,12 @@ main = do
   let g = Equals Rating (2.0 :: Float)
   let h = LessThan Rating (20 :: Int)
   -- let j = LessThan Rating 't' -- invalid
-  print c
-  print d
-  print e
-  print f'
-  print g
-  print h
+  print $ toQuery c
+  print $ toQuery d
+  print $ toQuery e
+  print $ toQuery f'
+  print $ toQuery g
+  print $ toQuery h
   print $ eval c 1999
   print $ eval c 2000
   print $ eval h 21
@@ -95,9 +89,4 @@ main = do
 
   -- print $ map toFacet [Year, Studio] -- invalid
   print $ map toFacet' [Facetable Year, Facetable Studio] -- WORKS
-
-  print $ toQuery (Expr (Equals Year 2000) 2000)
-  print $ toQuery (Expr (Range Year (2000,2005)) 2000)
-  print $ map toQuery [ (Expr (Equals Year 2000) 2000),  (Expr (Range Year (2000,2005)) 2000) ]
-
 
