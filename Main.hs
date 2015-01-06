@@ -44,10 +44,7 @@ toQuery (Match f s) = toDBField f ++ " =~ " ++ toQVal s
 toQuery (Range f x y) = toDBField f ++ " between " ++ show x ++ " and " ++ show y
 
 fromPairs :: (String, [String]) -> Constraint
-fromPairs ("year",xs) = numConstraint Year xs
-fromPairs ("studio",xs) = strConstraint Studio xs 
-fromPairs ("rating",xs) = numConstraint Rating xs
-fromPairs _ = undefined
+fromPairs (k,vs) = toParamParser k $ vs
 
 toParamParser :: String -> ([String] -> Constraint)
 toParamParser "year" = numConstraint Year
