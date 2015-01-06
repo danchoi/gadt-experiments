@@ -31,18 +31,21 @@ eval (Match f v) v' = v == v'
 eval (Range f (x,y)) v   = v >= x && v <= y
 
 
-{- invalid:
-toField :: String -> Field a
-toField "year" = Year
-toField "studio" = Studio
-toField "rating" = Rating
--}
+
+data AnyField = forall a. Show a => AnyField a
+instance Show AnyField where
+  showsPrec p (AnyField a) = showsPrec p a
+
+toField :: String -> AnyField
+toField "year" = AnyField Year
+toField "studio" = AnyField Studio
+toField "rating" = AnyField Rating
+
 
 toFacet :: Field a -> String
 toFacet = show
 
 data Facetable = forall a. Show a => Facetable a
-
 toFacet' :: Facetable -> String
 toFacet' (Facetable x) = show x
 
@@ -74,6 +77,8 @@ main = do
   print $ eval e "Miramax"
   -- print $ eval e 200  -- invalid
 
+  print $ toField "year"
+  print $ [toField "year", toField "studio"]
 
   print $ toFacet Year
   print $ toFacet Studio
