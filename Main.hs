@@ -1,5 +1,6 @@
 {-# LANGUAGE OverloadedStrings, GADTs, ExistentialQuantification #-} 
 module Main where
+import Data.Typeable
 
 data Field a where 
   Year :: Field Int 
@@ -20,17 +21,23 @@ data Constraint a where
   Match :: Field String -> String -> Constraint String
   Range :: Ord a => Field a -> (a, a) -> Constraint a
 
+
 eval :: Constraint a -> a -> Bool
 eval (Equals f v) v' = v == v'
 eval (LessThan f v) v' = v < v'
 eval (Match f v) v' = v == v'
 eval (Range f (x,y)) v   = v >= x && v <= y
 
+data AnyConstraint = forall a. ToQuery a => AnyConstraint a
 
+
+fromPairs :: (String, String) -> AnyConstraint
+fromPairs ("year",x) = AnyConstraint $ Equals Year (read x)
+fromPairs ("studio",x) = AnyConstraint $ Equals Studio x
+fromPairs _ = undefined
  
 class ToQuery a where
   toQuery :: a -> String
-
 
 instance Show a => ToQuery (Constraint a) where
   toQuery (Equals f v) = toDBField f ++ " == " ++ show v
@@ -38,6 +45,8 @@ instance Show a => ToQuery (Constraint a) where
   toQuery (Match f s) = toDBField f ++ " =~ " ++ show s
   toQuery (Range f s@(x,y)) = toDBField f ++ " between " ++ show s
 
+instance ToQuery AnyConstraint where
+  toQuery (AnyConstraint x) = toQuery x
 
 
 
@@ -94,3 +103,7 @@ main = do
   -- print $ map toFacet [Year, Studio] -- invalid
   -- print $ map toFacet' [Facetable Year, Facetable Studio] -- WORKS
 
+  print $ [ toDBField x | AnyField x <- [AnyField Year, AnyField Studio] ]
+
+  -- uses instance ToQuery AnyConstraint, and fromPairs
+  print $ map (toQuery . fromPairs) [("year", "2000"), ("studio", "Miramax")]
