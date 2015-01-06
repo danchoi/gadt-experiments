@@ -32,6 +32,7 @@ main = do
   -- let invalid = Match 2002 -- fails
   let g = Equals Rating (2.0 :: Float)
   let h = LessThan Rating (20 :: Int)
+  -- let j = LessThan Rating 't' -- invalid
   print c
   print d
   print e
