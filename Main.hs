@@ -14,6 +14,7 @@ instance ToDBField (Field a) where
   toDBField Year = "year" 
   toDBField Studio = "studio" 
   toDBField Rating = "rating" 
+  -- compiles forces you to exhaust patterns
 
 data Constraint a where
   Equals :: Eq a => Field a -> a -> Constraint a
