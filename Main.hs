@@ -31,9 +31,10 @@ instance ToQuery Constraint  where
   toQuery (Range f s@(x,y)) = toDBField f ++ " between " ++ show s
 
 
-fromPairs :: (String, String) -> Constraint
-fromPairs ("year",x) = Equals Year (read x)
-fromPairs ("studio",x) = Equals Studio x
+fromPairs :: (String, [String]) -> Constraint
+fromPairs ("year",[x]) = Equals Year (read x)
+fromPairs ("year",x:y:_) = Range Year ((read x), (read y))
+fromPairs ("studio",[x]) = Equals Studio x
 fromPairs _ = undefined
 
 
@@ -43,8 +44,10 @@ main = do
   -- let d = Match Studio 11 -- FAILS
   let d = Match Studio "Paramount" 
   print $ map toQuery [Equals Year 1999, Match Studio "MGM", Range Rating (1,4)]
-  mapM_ print $ map (toQuery . fromPairs) [("year", "2000"), ("studio", "Miramax")]
+  mapM_ print $ map (toQuery . fromPairs) [("year", ["2000"]), ("studio", ["Miramax"])]
   -- "year == 2000"
   -- "studio == \"Miramax\""
+  mapM_ print $ map (toQuery . fromPairs) [("year", ["2000", "2002"])]
+  -- "year between (2000,2002)"
 
   return ()
