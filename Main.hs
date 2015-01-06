@@ -44,12 +44,18 @@ toQuery (Match f s) = toDBField f ++ " =~ " ++ toQVal s
 toQuery (Range f x y) = toDBField f ++ " between " ++ show x ++ " and " ++ show y
 
 fromPairs :: (String, [String]) -> Constraint
-fromPairs ("year",[x]) = Equals Year (read x)
-fromPairs ("year",x:y:_) = Range Year (read x) (read y)
-fromPairs ("studio",[x]) = Equals Studio x
+fromPairs ("year",xs) = intConstraint Year xs
+fromPairs ("studio",xs) = strConstraint Studio xs 
 fromPairs ("rating",[x]) = Rating :>: (read x)
 fromPairs ("rating",x:y:_) = Range Rating (read x) (read y)
 fromPairs _ = undefined
+
+intConstraint :: Field Int -> [String] -> Constraint
+intConstraint field [x] = Equals field (read x)
+intConstraint field (x:y:_) = Range field (read x) (read y)
+
+strConstraint :: Field String -> [String] -> Constraint
+strConstraint field (x:_) = Equals field x
 
 main = do
   let c = Equals Year 1999
