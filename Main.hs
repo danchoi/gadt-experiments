@@ -10,9 +10,9 @@ class ToDBField a where
   toDBField :: a -> String
 
 instance ToDBField (Field a) where
-  toDBField Year = "Year" 
-  toDBField Studio = "Studio" 
-  toDBField Rating = "Rating" 
+  toDBField Year = "year" 
+  toDBField Studio = "studio" 
+  toDBField Rating = "rating" 
 
 data Constraint a where
   Equals :: Eq a => Field a -> a -> Constraint a
