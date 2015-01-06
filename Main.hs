@@ -21,14 +21,12 @@ data Constraint where
   Match :: Field String -> String -> Constraint 
   Range :: (Show a, Ord a) => Field a -> (a, a) -> Constraint 
 
-class ToQuery a where
-  toQuery :: a -> String
 
-instance ToQuery Constraint  where
-  toQuery (Equals f v) = toDBField f ++ " == " ++ show v
-  toQuery (LessThan f v) = toDBField f ++ " < " ++ show v
-  toQuery (Match f s) = toDBField f ++ " =~ " ++ show s
-  toQuery (Range f s@(x,y)) = toDBField f ++ " between " ++ show s
+toQuery :: Constraint -> String
+toQuery (Equals f v) = toDBField f ++ " == " ++ show v
+toQuery (LessThan f v) = toDBField f ++ " < " ++ show v
+toQuery (Match f s) = toDBField f ++ " =~ " ++ show s
+toQuery (Range f s@(x,y)) = toDBField f ++ " between " ++ show s
 
 
 fromPairs :: (String, [String]) -> Constraint
