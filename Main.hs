@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings, GADTs #-} 
+{-# LANGUAGE OverloadedStrings, GADTs, ExistentialQuantification #-} 
 module Main where
 
 data Field a where 
@@ -32,9 +32,12 @@ eval (Range f (x,y)) v   = v >= x && v <= y
 
 
 toFacet :: Field a -> String
-toFacet Year = "blah"
-toFacet Studio = "blah s"
-toFacet Rating = "blah r"
+toFacet = show
+
+data Facetable = forall a. Show a => Facetable a
+
+toFacet' :: Facetable -> String
+toFacet' (Facetable x) = show x
 
 main = do
   let c = Equals Year 1999
@@ -67,4 +70,10 @@ main = do
 
   print $ toFacet Year
   print $ toFacet Studio
+
+  -- Existentials https://www.haskell.org/haskellwiki/Existential_type
+
+  -- print $ map toFacet [Year, Studio] -- invalid
+  print $ map toFacet' [Facetable Year, Facetable Studio] -- WORKS
+
 
