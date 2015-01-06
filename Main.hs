@@ -26,15 +26,10 @@ data Constraint where
 class ToQVal a where
     toQVal :: a -> String
 
-instance ToQVal String where 
-    toQVal x = "S'" ++ show x ++ "'"
-
-instance ToQVal Int where 
-    toQVal = show 
-instance ToQVal Double where 
-    toQVal = show 
-instance ToQVal Float where 
-    toQVal = show 
+instance ToQVal String where toQVal x = "S'" ++ show x ++ "'"
+instance ToQVal Int where toQVal = show 
+instance ToQVal Double where toQVal = show 
+instance ToQVal Float where toQVal = show 
 
 toQuery :: Constraint -> String
 toQuery (Equals f v) = toDBField f ++ " == " ++ toQVal v
