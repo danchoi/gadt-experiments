@@ -36,5 +36,5 @@ main = do
   let c = Equals Year 1999
   -- let d = Match Studio 11 -- FAILS
   let d = Match Studio "Paramount" 
-  print $ map toQuery [c,d]
+  print $ map toQuery [Equals Year 1999, Match Studio "MGM", Range Rating (1,4)]
   return ()
