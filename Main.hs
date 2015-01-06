@@ -22,13 +22,6 @@ data Constraint a where
   Match :: Field String -> String -> Constraint String
   Range :: Ord a => Field a -> (a, a) -> Constraint a
 
-
-eval :: Constraint a -> a -> Bool
-eval (Equals f v) v' = v == v'
-eval (LessThan f v) v' = v < v'
-eval (Match f v) v' = v == v'
-eval (Range f (x,y)) v   = v >= x && v <= y
-
 data AnyConstraint = forall a. ToQuery a => AnyConstraint a
 
 
@@ -84,16 +77,6 @@ main = do
   print $ toQuery f'
   print $ toQuery g
   print $ toQuery h
-  print $ eval c 1999
-  print $ eval c 2000
-  print $ eval h 21
-  -- print $ eval h 21.0 -- type mismatch
-  print $ eval f' 1991
-  print $ eval f' 1980
-  -- print $ eval f' 'a'  -- type mismatch
-  print $ eval e "Miramax"
-  -- print $ eval e 200  -- invalid
-
   print $ toDBField $ toField "year"
   print $ map toDBField $ [toField "year", toField "studio"]
   print $ map (toDBField . toField) ["year", "studio"]
