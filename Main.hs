@@ -23,12 +23,24 @@ instance (Show a) => Show (Constraint a) where
   show (Match f s) = show f ++ " =~ " ++ show s
   show (Range f s@(x,y)) = show f ++ " between " ++ show s
 
-
 eval :: Constraint a -> a -> Bool
 eval (Equals f v) v' = v == v'
 eval (LessThan f v) v' = v < v'
 eval (Match f v) v' = v == v'
 eval (Range f (x,y)) v   = v >= x && v <= y
+
+
+data Expr where
+  Expr :: Show a => Constraint a -> a -> Expr
+  
+class ToQuery a where
+  toQuery :: a -> String
+
+instance ToQuery Expr where
+  toQuery (Expr c v) = toQuery c ++ " " ++ show v
+
+instance Show a => ToQuery (Constraint a) where
+  toQuery = show
 
 
 
@@ -83,5 +95,9 @@ main = do
 
   -- print $ map toFacet [Year, Studio] -- invalid
   print $ map toFacet' [Facetable Year, Facetable Studio] -- WORKS
+
+  print $ toQuery (Expr (Equals Year 2000) 2000)
+  print $ toQuery (Expr (Range Year (2000,2005)) 2000)
+  print $ map toQuery [ (Expr (Equals Year 2000) 2000),  (Expr (Range Year (2000,2005)) 2000) ]
 
 
