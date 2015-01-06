@@ -31,6 +31,13 @@ eval (Match f v) v' = v == v'
 eval (Range f (x,y)) v   = v >= x && v <= y
 
 
+{- invalid:
+toField :: String -> Field a
+toField "year" = Year
+toField "studio" = Studio
+toField "rating" = Rating
+-}
+
 toFacet :: Field a -> String
 toFacet = show
 
